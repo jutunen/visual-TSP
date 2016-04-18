@@ -41,12 +41,12 @@ jQuery - For generic DOM manipulation etc. http://jquery.com/
 
 ##License
 
-For permutation-engine.js:__
-Copyright (c) 2012 Erik Poupaert.__
-Licensed under the Library General Public License (LGPL).__
+For permutation-engine.js:  
+Copyright (c) 2012 Erik Poupaert.  
+Licensed under the Library General Public License (LGPL).  
 
-For the rest of the files:__
-Copyright (c) 2016 Jussi Utunen__
+For the rest of the files:  
+Copyright (c) 2016 Jussi Utunen  
 Licensed under the MIT License:
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
