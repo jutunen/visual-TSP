@@ -26,7 +26,7 @@ Start the server with command **node tsp-solver.js**
 
 ##TSP solving algorithms
 
-Currently all implementations use brute force search to find the shortest routes.
+Currently all implementations use brute force search to find the shortest routes. Brute force search is very ineffective way to solve a TSP and therefore the maximum count of "cities" is limited to 9.
 
 ##3rd party libraries
 
@@ -41,11 +41,11 @@ jQuery - For generic DOM manipulation etc. http://jquery.com/
 
 ##License
 
-For permutation-engine.js:  
+**For permutation-engine.js:**   
 Copyright (c) 2012 Erik Poupaert.  
 Licensed under the Library General Public License (LGPL).  
 
-For the rest of the files:  
+**For the rest of the files:**   
 Copyright (c) 2016 Jussi Utunen  
 Licensed under the MIT License:
 
