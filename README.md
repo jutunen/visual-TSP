@@ -8,9 +8,9 @@ Visual-TSP - a web application for travelling salesman problem visualization and
 Edit *build.sh* Bash script and set TARGET_DIR as you wish.
 
 *Visual-tsp.js* file is a result of compilation from *visual-tsp-jsx.js* file.  
-For compiling *visual-tsp-jsx.js* by yourself, a compiler such as Babel JS is needed for React JSX compiling.  
+To compile *visual-tsp-jsx.js* by yourself, a compiler such as [Babel JS](https://babeljs.io/) is needed for React JSX compiling.  
 To start experimenting with TSP, open *visual-tsp.html* in your browser.  
-Make sure your browser is up-to-date enough to be able to handle ES6.
+Make sure your browser is up-to-date enough to be able to handle [ES6](https://developer.mozilla.org/en-US/docs/Web/JavaScript/New_in_JavaScript/ECMAScript_6_support_in_Mozilla).
 
 ##Server Installation
 
@@ -20,7 +20,7 @@ Client side application contains a TSP solver, but server side calculation is re
 Python application is based on Tornado server, see http://www.tornadoweb.org/en/stable/ for installation instructions.  
 Once you have Tornado installed, start the server with command **python3 tsp-solver.py**
 
-Node.js application is based on express, express-ws and permutation-engine.  
+Node.js application is based on [express](https://www.npmjs.com/package/express), [express-ws](https://www.npmjs.com/package/express-ws) and [permutation-engine](https://www.npmjs.com/package/permutation-engine).  
 Install tsp-solver.js with command **npm install**  
 Start the server with command **node tsp-solver.js**
 
