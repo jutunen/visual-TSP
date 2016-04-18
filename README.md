@@ -1,5 +1,7 @@
 # visual-TSP
-Travelling salesman problem visualizer and solver.
+Visual-TSP - a web application for travelling salesman problem visualization and solving.
+
+![Screenshot](screenshot.jpg)
 
 ##Client Installation
 
