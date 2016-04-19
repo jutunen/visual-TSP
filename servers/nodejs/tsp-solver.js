@@ -6,7 +6,7 @@ var permutationEngine = require('permutation-engine');
 app.use(express.static('public'));
 
 app.listen(9999, function () {
-  console.log('Server listening on port 9999!');
+  console.log('Server listening on port 9999');
 });
 
 app.ws('/tsp', function(ws, req) {

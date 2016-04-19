@@ -41,7 +41,7 @@ jQuery - For generic DOM manipulation etc. http://jquery.com/
 
 ##Contributing
 
-Server implementations with different TSP solving algorithms are welcome. Each server should have their own directory under servers directory. Directories should be named with following naming convention: *implementationLanguage-algorithmName*
+Server implementations with different TSP solving algorithms are welcome. Each server should have their own directory under *servers* directory. Directories should be named with following naming convention: *implementationLanguage-algorithmName*
 
 ##License
 

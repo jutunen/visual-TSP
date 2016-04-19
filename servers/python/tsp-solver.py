@@ -134,14 +134,14 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     return True
 
   def open(self):
-    print('user is connected.\n')
+    print('User is connected.')
 
   def on_message(self, message):
     obj = json.loads(message)
     self.write_message(permutate(obj))
 
   def on_close(self):
-    print('connection closed\n')
+    print('Connection closed.')
 
 #Uncomment following line if you are providing only the web socket interface and not serving static files with Tornado
 application = tornado.web.Application([(r'/tsp', WSHandler),])
@@ -152,4 +152,5 @@ application = tornado.web.Application([(r'/tsp', WSHandler),])
 if __name__ == "__main__":
   http_server = tornado.httpserver.HTTPServer(application)
   http_server.listen(9999)
+  print('Server listening on port 9999')
   tornado.ioloop.IOLoop.instance().start()
