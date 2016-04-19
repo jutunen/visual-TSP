@@ -496,7 +496,7 @@ function coordsHandler() {
     g_coords_table.push(state.nodes[index].y);
     frag_id_string += state.nodes[index].x + "," + state.nodes[index].y + ",";
   }
-  //note that coords are in one dimensional table => 1 xy pair of coords takes to slots from the table
+  //note that coords are in one dimensional table => 1 xy pair of coords takes 2 slots from the table
 
   history.replaceState(undefined, undefined, "#" + frag_id_string);
 
@@ -507,7 +507,7 @@ function coordsHandler() {
 
   if (g_coords_table.length > 3) {
     //with more than 1 pair of coords in the table, send the table to path calculation
-    //note that coords are in one dimensional table => 1 xy pair of coords takes to slots from the table
+    //note that coords are in one dimensional table => 1 xy pair of coords takes 2 slots from the table
     sendMessage(g_coords_table);
   } else {
     //with less than 2 pair of coords, clear all routes from canvas
@@ -575,7 +575,6 @@ function removeLinesFromCanvas() {
 }
 
 function openWebSocket() {
-  //g_web_socket = new WebSocket("ws://127.0.0.1/soketti");
   g_web_socket = new WebSocket($("#socket_server_address").val().toLowerCase().trim());
   g_web_socket.onopen = function (evt) {
     checkWebSocketState();
