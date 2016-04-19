@@ -9,8 +9,7 @@ Edit *build.sh* Bash script and set TARGET_DIR as you wish.
 
 *Visual-tsp.js* file is a result of compilation from *visual-tsp-jsx.js* file.  
 *Visual-tsp.js* is a precompiled file, but if a recompilation is needed, a compiler such as [Babel JS](https://babeljs.io/) is required for React JSX compiling.  
-To start experimenting with TSP, open *visual-tsp.html* in your browser.  
-Make sure your browser is up-to-date enough to be able to handle [ES6](https://developer.mozilla.org/en-US/docs/Web/JavaScript/New_in_JavaScript/ECMAScript_6_support_in_Mozilla).
+To start experimenting with TSP, open *visual-tsp.html* in your browser.
 
 ##Server Installation
 
@@ -41,7 +40,8 @@ jQuery - For generic DOM manipulation etc. http://jquery.com/
 
 ##Contributing
 
-Server implementations with different TSP solving algorithms are welcome. Each server should have their own directory under *servers* directory. Directories should be named with following naming convention: *implementationLanguage-algorithmName*
+Server implementations with different TSP solving algorithms are welcome. Each server should have their own directory under *servers* directory. Directories should be named with following naming convention:  
+*implementationLanguage-algorithmName*
 
 ##License
 

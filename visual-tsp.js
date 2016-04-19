@@ -1,5 +1,7 @@
 "use strict";
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 var g_maxNodeCount = 9;
 var g_coords_table = [];
 var g_coords_table_prev = [];
@@ -27,32 +29,32 @@ var g_node_count;
 
 // message sending intervals in milliseconds
 // more nodes --> longer path calculation duration --> more time between msgs needed
-const MSG_SEND_INTERVAL_LOW = 300;
-const MSG_SEND_INTERVAL_MIDDLE = 500;
-const MSG_SEND_INTERVAL_HIGH = 1000;
+var MSG_SEND_INTERVAL_LOW = 300;
+var MSG_SEND_INTERVAL_MIDDLE = 500;
+var MSG_SEND_INTERVAL_HIGH = 1000;
 
-const CANVAS_DIMENSION_PXLS = 700;
-const DEFAULT_WS_ADDRESS = "ws://127.0.0.1:9999/tsp";
+var CANVAS_DIMENSION_PXLS = 700;
+var DEFAULT_WS_ADDRESS = "ws://127.0.0.1:9999/tsp";
 
-const CB_ID_1 = 0; // checkbox identifier
-const CB_ID_2 = 1; // checkbox identifier
+var CB_ID_1 = 0; // checkbox identifier
+var CB_ID_2 = 1; // checkbox identifier
 
 //Redux reducer definitions BEGIN
-const ADD_NODE = 'ADD_NODE';
-const REMOVE_NODE = 'REMOVE_NODE';
-const REMOVE_ALL_NODES = 'REMOVE_ALL_NODES';
-const CHANGE_X = 'CHANGE_X';
-const CHANGE_Y = 'CHANGE_Y';
-const CHANGE_XY = 'CHANGE_XY';
-const TOGGLE_1 = 'TOGGLE_1';
-const TOGGLE_2 = 'TOGGLE_2';
+var ADD_NODE = 'ADD_NODE';
+var REMOVE_NODE = 'REMOVE_NODE';
+var REMOVE_ALL_NODES = 'REMOVE_ALL_NODES';
+var CHANGE_X = 'CHANGE_X';
+var CHANGE_Y = 'CHANGE_Y';
+var CHANGE_XY = 'CHANGE_XY';
+var TOGGLE_1 = 'TOGGLE_1';
+var TOGGLE_2 = 'TOGGLE_2';
 
 function addNode(x, y, id) {
-  return { type: ADD_NODE, x, y, id };
+  return { type: ADD_NODE, x: x, y: y, id: id };
 }
 
 function removeNode(id) {
-  return { type: REMOVE_NODE, id };
+  return { type: REMOVE_NODE, id: id };
 }
 
 function removeAllNodes() {
@@ -60,15 +62,15 @@ function removeAllNodes() {
 }
 
 function changeX(id, value) {
-  return { type: CHANGE_X, id, value };
+  return { type: CHANGE_X, id: id, value: value };
 }
 
 function changeY(id, value) {
-  return { type: CHANGE_Y, id, value };
+  return { type: CHANGE_Y, id: id, value: value };
 }
 
 function changeXY(id, xvalue, yvalue) {
-  return { type: CHANGE_XY, id, xvalue, yvalue };
+  return { type: CHANGE_XY, id: id, xvalue: xvalue, yvalue: yvalue };
 }
 
 function toggle_1() {
@@ -79,12 +81,15 @@ function toggle_2() {
   return { type: TOGGLE_2 };
 }
 
-const initialState = {
+var initialState = {
   nodes: [],
   checkboxes: [true, false]
 };
 
-function solverApp(state = initialState, action) {
+function solverApp() {
+  var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
+  var action = arguments[1];
+
 
   function func_filter(node) {
     if (node.id === action.id) {
@@ -118,11 +123,11 @@ function solverApp(state = initialState, action) {
 
     case ADD_NODE:
       return Object.assign({}, state, {
-        nodes: [...state.nodes, {
+        nodes: [].concat(_toConsumableArray(state.nodes), [{
           x: action.x,
           y: action.y,
           id: action.id
-        }]
+        }])
       });
 
     case REMOVE_ALL_NODES:
@@ -159,19 +164,21 @@ function init() {
   g_store = Redux.createStore(solverApp);
 
   //let unsubscribe = store.subscribe( () => console.log(store.getState() ) );
-  g_store.subscribe(() => coordsHandler());
+  g_store.subscribe(function () {
+    return coordsHandler();
+  });
 
   var RPathsList = React.createClass({
     displayName: "RPathsList",
 
-    handleOnChange: function (id, event) {
+    handleOnChange: function handleOnChange(id, event) {
       if (id === CB_ID_1) {
         g_store.dispatch(toggle_1());
       } else {
         g_store.dispatch(toggle_2());
       }
     },
-    render: function () {
+    render: function render() {
       var createItem = function (item) {
         var klass = '';
         if (!item.checked) {
@@ -210,18 +217,18 @@ function init() {
   var RCoordsList = React.createClass({
     displayName: "RCoordsList",
 
-    handleOnClick: function (id, event) {
+    handleOnClick: function handleOnClick(id, event) {
       removeCanvasChildById(id);
       g_store.dispatch(removeNode(id));
       g_id_store.recycleId(id);
     },
-    handleOnMouseLeave: function (id, event) {
+    handleOnMouseLeave: function handleOnMouseLeave(id, event) {
       removeSurroundingEllipseById(id);
     },
-    handleOnMouseEnter: function (id, event) {
+    handleOnMouseEnter: function handleOnMouseEnter(id, event) {
       drawSurroundingEllipseById(id);
     },
-    handleOnChangeX: function (id, event) {
+    handleOnChangeX: function handleOnChangeX(id, event) {
       var child;
       var new_x = Number(event.target.value);
       g_store.dispatch(changeX(id, new_x));
@@ -234,7 +241,7 @@ function init() {
         }
       }
     },
-    handleOnChangeY: function (id, event) {
+    handleOnChangeY: function handleOnChangeY(id, event) {
       var child;
       var new_y = Number(event.target.value);
       g_store.dispatch(changeY(id, new_y));
@@ -248,7 +255,7 @@ function init() {
       }
     },
 
-    render: function () {
+    render: function render() {
       var createItem = function (item) {
         var klass = '';
         if (item.id === this.props.active) {
@@ -274,19 +281,19 @@ function init() {
   var RCoordsApp = React.createClass({
     displayName: "RCoordsApp",
 
-    getInitialState: function () {
+    getInitialState: function getInitialState() {
       return { coords: [], paths: [] };
     },
-    setRCoords: function () {
+    setRCoords: function setRCoords() {
       this.setState({ coords: g_RCOORDS });
     },
-    setRPaths: function () {
+    setRPaths: function setRPaths() {
       this.setState({ paths: g_RPATHS });
     },
-    setRActive: function (id) {
+    setRActive: function setRActive(id) {
       this.setState({ active: id });
     },
-    render: function () {
+    render: function render() {
       return React.createElement(
         "div",
         null,
@@ -825,7 +832,10 @@ function clearAll() {
   g_2ndShortestRoute.length = 0;
 }
 
-function createNewEllipse(x, y, id, radius = g_canvasNodeRadius, fill = g_canvasNodeFill) {
+function createNewEllipse(x, y, id) {
+  var radius = arguments.length <= 3 || arguments[3] === undefined ? g_canvasNodeRadius : arguments[3];
+  var fill = arguments.length <= 4 || arguments[4] === undefined ? g_canvasNodeFill : arguments[4];
+
   return g_canvas.display.ellipse({
     x: x,
     y: y,
@@ -874,8 +884,9 @@ function idHandler() {
 
 function calculateFactorial(num) {
   var rval = 1;
-  for (var i = 2; i <= num; i++) rval = rval * i;
-  return rval;
+  for (var i = 2; i <= num; i++) {
+    rval = rval * i;
+  }return rval;
 }
 
 function getRouteLength(permutation, coords, first) {
