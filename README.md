@@ -3,7 +3,7 @@ Visual-TSP - a web application for [travelling salesman problem](https://en.wiki
 
 ![Screenshot](screenshot.jpg)
 
-##Client Installation
+## Client Installation
 
 Edit *build.sh* Bash script and set TARGET_DIR as you wish.
 
@@ -11,7 +11,7 @@ Edit *build.sh* Bash script and set TARGET_DIR as you wish.
 *Visual-tsp.js* is a precompiled file, but if a recompilation is needed, a compiler such as [Babel JS](https://babeljs.io/) is required for React JSX compiling.  
 To start experimenting with TSP, open *visual-tsp.html* in your browser.
 
-##Server Installation
+## Server Installation
 
 Client side application contains a TSP solver, but server side calculation is recommended for smoother UX.  
 'servers' directory contains TSP solver implementations for Python and Node.js.
@@ -23,11 +23,11 @@ Node.js application is based on [express](https://www.npmjs.com/package/express)
 Install tsp-solver.js with command **npm install**  
 Start the server with command **node tsp-solver.js**
 
-##TSP solving algorithms
+## TSP solving algorithms
 
-Currently all implementations use brute force search to find the shortest routes. Brute force search is very ineffective way to solve a TSP and therefore the maximum count of "cities" is limited to 9.
+Currently all implementations use brute force search to find the shortest routes. Brute force search is very inefficient way to solve a TSP and therefore the maximum count of "cities" is limited to 9.
 
-##3rd party libraries
+## 3rd party libraries
 
 This project includes a permutation-engine.js file from https://github.com/eriksank/permutation-engine
 
@@ -38,12 +38,12 @@ Redux - Application state container http://redux.js.org/
 React - For listing the coordinates etc. https://facebook.github.io/react/  
 jQuery - For generic DOM manipulation etc. http://jquery.com/
 
-##Contributing
+## Contributing
 
 Server implementations with different TSP solving algorithms are welcome. Each server should have their own directory under *servers* directory. Directories should be named with following naming convention:  
 *implementationLanguage-algorithmName*
 
-##License
+## License
 
 **For permutation-engine.js:**   
 Copyright (c) 2012 Erik Poupaert.  
