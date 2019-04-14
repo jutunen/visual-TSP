@@ -8,7 +8,8 @@
 <SCRIPT type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/redux/3.4.0/redux.min.js"></SCRIPT>
 <SCRIPT type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ocanvas/2.8.3/ocanvas.min.js"></SCRIPT>
 <SCRIPT type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></SCRIPT>
-<SCRIPT type="text/javascript" src="permutation-engine.js"></SCRIPT>
+<!--SCRIPT type="text/javascript" src="permutation-engine.js"></SCRIPT-->
+<SCRIPT type="text/javascript" src="tsp-web-worker.js"></SCRIPT>
 <SCRIPT type="text/javascript" src="visual-tsp.js"></SCRIPT>
 <TITLE>Visual TSP</TITLE>
 </HEAD>
@@ -34,11 +35,11 @@
           <span id="websocket_status"></span>
           <input type="button" id="connect_button" value="Connect" onclick="openWebSocket()">
         </div>
-      </div>      
+      </div>
       <input type="button" id="clear_button" value="Clear all" onclick="clearAllButton()">
       <div id="checkbox_container">
         <label>
-          <input type="checkbox" id="client_side_cb" onchange="cbChanged()">
+          <input type="checkbox" id="client_side_cb" onchange="cbChanged()" checked>
           Client side route calculation
         </label>
       </div>

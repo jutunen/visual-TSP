@@ -23,6 +23,7 @@ var g_client_side_path_calculation;
 var g_store;
 var g_id_store;
 var g_node_count;
+var g_worker; // web worker
 
 // message sending intervals in milliseconds
 // more nodes --> longer path calculation duration --> more time between msgs needed
@@ -663,16 +664,24 @@ function checkWebSocketState()
     }
 }
 
-function sendMessage(coords_table)
-{
-  if(g_client_side_path_calculation)
-    {
-    messageReceived( permutateRoutesAndFindShortest(coords_table),true );
+function sendMessage(coords_table) {
+  if (g_client_side_path_calculation) {
+
+    if (typeof(g_worker) == "undefined") {
+      g_worker = new Worker("tsp-web-worker.js");
+    } else {
+      g_worker.terminate();
+      g_worker = new Worker("tsp-web-worker.js");
     }
-  else
-    {
-    if(g_web_socket.readyState === 1)
-      {
+
+    g_worker.onmessage = function (event) {
+      messageReceived(event.data, true);
+    }
+
+    g_worker.postMessage(coords_table);
+
+  } else {
+    if (g_web_socket.readyState === 1) {
       g_web_socket.send(JSON.stringify(coords_table));
       }
     }
@@ -946,104 +955,7 @@ function idHandler()
       }
 }
 
-function calculateFactorial(num)
-{
-    var rval=1;
-    for (var i = 2; i <= num; i++)
-        rval = rval * i;
-    return rval;
-}
-
-function getRouteLength(permutation,coords,first)
-{
-  var route_length = 0;
-
-  for(var index = 0; index < permutation.length; index++)
-    {
-    route_length += calculateDistance(coords[permutation[index]-1], coords[permutation[index+1]-1]);
-    }
-
-  route_length += calculateDistance(first, coords[permutation[0]-1]);
-  route_length += calculateDistance(first, coords[permutation[permutation.length-1]-1]);
-
-  //truncate to four decimals because same route with different direction can have a small length difference
-  return Math.round(Number(route_length) * 10000) / 10000;
-}
-
-function getCoordsByPermIndex( index )
-{
-  return this[index -1];
-}
-
-function permutateRoutesAndFindShortest(received_array)
-{
-    var coords_array = [];
-
-    for(var i = 0; i < received_array.length; i += 2)
-      {
-      var node = [received_array[i],received_array[i+1]];
-      coords_array.push(node);
-      }
-
-    if(coords_array.length < 3)
-      {
-      coords_array.unshift(0);
-      return JSON.stringify(coords_array);
-      }
-
-    var perms_count = calculateFactorial(coords_array.length - 1);
-    var permengine = new engine(coords_array.length - 1);
-    var permutation;
-    var shortest_permutation = [];
-    var shortest_route_length = 1000000;
-    var second_shortest_permutation;
-    var second_shortest_route_length = 1000000;
-    var route_length;
-    var first_coords = coords_array.shift();
-
-    for(var index = 0; index < perms_count; index++)
-      {
-      permutation = permengine.index2perm(index);
-      route_length = getRouteLength(permutation,coords_array,first_coords);
-      if(route_length < shortest_route_length)
-        {
-        second_shortest_route_length = shortest_route_length;
-        //console.log("2nd: " + second_shortest_route_length + " " + index);
-        second_shortest_permutation = shortest_permutation.slice();
-        shortest_route_length = route_length;
-        //console.log("shortest: " + shortest_route_length + " " + index);
-        shortest_permutation = permutation;
-        }
-      else if(route_length < second_shortest_route_length && route_length > shortest_route_length)
-        {
-        second_shortest_route_length = route_length;
-        //console.log("2nd: " + second_shortest_route_length + " " + index);
-        second_shortest_permutation = permutation;
-        }
-      }
-
-    var shortest_route_array = shortest_permutation.map(getCoordsByPermIndex,coords_array);
-    shortest_route_array.unshift(first_coords); //beginning
-    shortest_route_array.push(first_coords); //ending
-
-    var second_shortest_route_array = [];
-    var both_routes_array = [];
-    if(second_shortest_route_length !== 1000000)
-      {
-      second_shortest_route_array = second_shortest_permutation.map(getCoordsByPermIndex,coords_array);
-      second_shortest_route_array.unshift(first_coords); //beginning
-      second_shortest_route_array.push(first_coords); //ending
-      both_routes_array = shortest_route_array.concat(second_shortest_route_array);
-      both_routes_array.unshift(1); //array to be returned contains both shortest and 2nd shortest paths
-      return JSON.stringify(both_routes_array);
-      }
-
-    shortest_route_array.unshift(0); //array to be returned contains only shortest path
-    return JSON.stringify(shortest_route_array);
-}
-
-function cbChanged()
-{
+function cbChanged() {
   checkCalculationSide(true);
   coordsHandler();
 }

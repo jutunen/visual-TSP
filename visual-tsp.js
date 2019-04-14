@@ -1,7 +1,5 @@
 "use strict";
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
 var g_maxNodeCount = 9;
 var g_coords_table = [];
 var g_coords_table_prev = [];
@@ -26,35 +24,36 @@ var g_client_side_path_calculation;
 var g_store;
 var g_id_store;
 var g_node_count;
+var g_worker; // web worker
 
 // message sending intervals in milliseconds
 // more nodes --> longer path calculation duration --> more time between msgs needed
-var MSG_SEND_INTERVAL_LOW = 300;
-var MSG_SEND_INTERVAL_MIDDLE = 500;
-var MSG_SEND_INTERVAL_HIGH = 1000;
+const MSG_SEND_INTERVAL_LOW = 300;
+const MSG_SEND_INTERVAL_MIDDLE = 500;
+const MSG_SEND_INTERVAL_HIGH = 1000;
 
-var CANVAS_DIMENSION_PXLS = 700;
-var DEFAULT_WS_ADDRESS = "ws://127.0.0.1:9999/tsp";
+const CANVAS_DIMENSION_PXLS = 700;
+const DEFAULT_WS_ADDRESS = "ws://127.0.0.1:9999/tsp";
 
-var CB_ID_1 = 0; // checkbox identifier
-var CB_ID_2 = 1; // checkbox identifier
+const CB_ID_1 = 0; // checkbox identifier
+const CB_ID_2 = 1; // checkbox identifier
 
 //Redux reducer definitions BEGIN
-var ADD_NODE = 'ADD_NODE';
-var REMOVE_NODE = 'REMOVE_NODE';
-var REMOVE_ALL_NODES = 'REMOVE_ALL_NODES';
-var CHANGE_X = 'CHANGE_X';
-var CHANGE_Y = 'CHANGE_Y';
-var CHANGE_XY = 'CHANGE_XY';
-var TOGGLE_1 = 'TOGGLE_1';
-var TOGGLE_2 = 'TOGGLE_2';
+const ADD_NODE = 'ADD_NODE';
+const REMOVE_NODE = 'REMOVE_NODE';
+const REMOVE_ALL_NODES = 'REMOVE_ALL_NODES';
+const CHANGE_X = 'CHANGE_X';
+const CHANGE_Y = 'CHANGE_Y';
+const CHANGE_XY = 'CHANGE_XY';
+const TOGGLE_1 = 'TOGGLE_1';
+const TOGGLE_2 = 'TOGGLE_2';
 
 function addNode(x, y, id) {
-  return { type: ADD_NODE, x: x, y: y, id: id };
+  return { type: ADD_NODE, x, y, id };
 }
 
 function removeNode(id) {
-  return { type: REMOVE_NODE, id: id };
+  return { type: REMOVE_NODE, id };
 }
 
 function removeAllNodes() {
@@ -62,15 +61,15 @@ function removeAllNodes() {
 }
 
 function changeX(id, value) {
-  return { type: CHANGE_X, id: id, value: value };
+  return { type: CHANGE_X, id, value };
 }
 
 function changeY(id, value) {
-  return { type: CHANGE_Y, id: id, value: value };
+  return { type: CHANGE_Y, id, value };
 }
 
 function changeXY(id, xvalue, yvalue) {
-  return { type: CHANGE_XY, id: id, xvalue: xvalue, yvalue: yvalue };
+  return { type: CHANGE_XY, id, xvalue, yvalue };
 }
 
 function toggle_1() {
@@ -81,15 +80,12 @@ function toggle_2() {
   return { type: TOGGLE_2 };
 }
 
-var initialState = {
+const initialState = {
   nodes: [],
   checkboxes: [true, false]
 };
 
-function solverApp() {
-  var state = arguments.length <= 0 || arguments[0] === undefined ? initialState : arguments[0];
-  var action = arguments[1];
-
+function solverApp(state = initialState, action) {
 
   function func_filter(node) {
     if (node.id === action.id) {
@@ -123,11 +119,11 @@ function solverApp() {
 
     case ADD_NODE:
       return Object.assign({}, state, {
-        nodes: [].concat(_toConsumableArray(state.nodes), [{
+        nodes: [...state.nodes, {
           x: action.x,
           y: action.y,
           id: action.id
-        }])
+        }]
       });
 
     case REMOVE_ALL_NODES:
@@ -164,21 +160,19 @@ function init() {
   g_store = Redux.createStore(solverApp);
 
   //let unsubscribe = store.subscribe( () => console.log(store.getState() ) );
-  g_store.subscribe(function () {
-    return coordsHandler();
-  });
+  g_store.subscribe(() => coordsHandler());
 
   var RPathsList = React.createClass({
     displayName: "RPathsList",
 
-    handleOnChange: function handleOnChange(id, event) {
+    handleOnChange: function (id, event) {
       if (id === CB_ID_1) {
         g_store.dispatch(toggle_1());
       } else {
         g_store.dispatch(toggle_2());
       }
     },
-    render: function render() {
+    render: function () {
       var createItem = function (item) {
         var klass = '';
         if (!item.checked) {
@@ -217,18 +211,18 @@ function init() {
   var RCoordsList = React.createClass({
     displayName: "RCoordsList",
 
-    handleOnClick: function handleOnClick(id, event) {
+    handleOnClick: function (id, event) {
       removeCanvasChildById(id);
       g_store.dispatch(removeNode(id));
       g_id_store.recycleId(id);
     },
-    handleOnMouseLeave: function handleOnMouseLeave(id, event) {
+    handleOnMouseLeave: function (id, event) {
       removeSurroundingEllipseById(id);
     },
-    handleOnMouseEnter: function handleOnMouseEnter(id, event) {
+    handleOnMouseEnter: function (id, event) {
       drawSurroundingEllipseById(id);
     },
-    handleOnChangeX: function handleOnChangeX(id, event) {
+    handleOnChangeX: function (id, event) {
       var child;
       var new_x = Number(event.target.value);
       g_store.dispatch(changeX(id, new_x));
@@ -241,7 +235,7 @@ function init() {
         }
       }
     },
-    handleOnChangeY: function handleOnChangeY(id, event) {
+    handleOnChangeY: function (id, event) {
       var child;
       var new_y = Number(event.target.value);
       g_store.dispatch(changeY(id, new_y));
@@ -255,7 +249,7 @@ function init() {
       }
     },
 
-    render: function render() {
+    render: function () {
       var createItem = function (item) {
         var klass = '';
         if (item.id === this.props.active) {
@@ -281,19 +275,19 @@ function init() {
   var RCoordsApp = React.createClass({
     displayName: "RCoordsApp",
 
-    getInitialState: function getInitialState() {
+    getInitialState: function () {
       return { coords: [], paths: [] };
     },
-    setRCoords: function setRCoords() {
+    setRCoords: function () {
       this.setState({ coords: g_RCOORDS });
     },
-    setRPaths: function setRPaths() {
+    setRPaths: function () {
       this.setState({ paths: g_RPATHS });
     },
-    setRActive: function setRActive(id) {
+    setRActive: function (id) {
       this.setState({ active: id });
     },
-    render: function render() {
+    render: function () {
       return React.createElement(
         "div",
         null,
@@ -326,6 +320,7 @@ function init() {
   g_first = "";
   displayInitTextsOnCanvas();
   callReactRefPaths();
+
 }
 
 function callReactRefCoords() {
@@ -582,6 +577,7 @@ function removeLinesFromCanvas() {
 }
 
 function openWebSocket() {
+  //g_web_socket = new WebSocket("ws://127.0.0.1/soketti");
   g_web_socket = new WebSocket($("#socket_server_address").val().toLowerCase().trim());
   g_web_socket.onopen = function (evt) {
     checkWebSocketState();
@@ -640,7 +636,20 @@ function checkWebSocketState() {
 
 function sendMessage(coords_table) {
   if (g_client_side_path_calculation) {
-    messageReceived(permutateRoutesAndFindShortest(coords_table), true);
+
+    if (typeof(g_worker) == "undefined") {
+      g_worker = new Worker("tsp-web-worker.js");
+    } else {
+      g_worker.terminate();
+      g_worker = new Worker("tsp-web-worker.js");
+    }
+
+    g_worker.onmessage = function (event) {
+      messageReceived(event.data, true);
+    }
+
+    g_worker.postMessage(coords_table);
+
   } else {
     if (g_web_socket.readyState === 1) {
       g_web_socket.send(JSON.stringify(coords_table));
@@ -832,10 +841,7 @@ function clearAll() {
   g_2ndShortestRoute.length = 0;
 }
 
-function createNewEllipse(x, y, id) {
-  var radius = arguments.length <= 3 || arguments[3] === undefined ? g_canvasNodeRadius : arguments[3];
-  var fill = arguments.length <= 4 || arguments[4] === undefined ? g_canvasNodeFill : arguments[4];
-
+function createNewEllipse(x, y, id, radius = g_canvasNodeRadius, fill = g_canvasNodeFill) {
   return g_canvas.display.ellipse({
     x: x,
     y: y,
@@ -882,90 +888,6 @@ function idHandler() {
   };
 }
 
-function calculateFactorial(num) {
-  var rval = 1;
-  for (var i = 2; i <= num; i++) {
-    rval = rval * i;
-  }return rval;
-}
-
-function getRouteLength(permutation, coords, first) {
-  var route_length = 0;
-
-  for (var index = 0; index < permutation.length; index++) {
-    route_length += calculateDistance(coords[permutation[index] - 1], coords[permutation[index + 1] - 1]);
-  }
-
-  route_length += calculateDistance(first, coords[permutation[0] - 1]);
-  route_length += calculateDistance(first, coords[permutation[permutation.length - 1] - 1]);
-
-  //truncate to four decimals because same route with different direction can have a small length difference
-  return Math.round(Number(route_length) * 10000) / 10000;
-}
-
-function getCoordsByPermIndex(index) {
-  return this[index - 1];
-}
-
-function permutateRoutesAndFindShortest(received_array) {
-  var coords_array = [];
-
-  for (var i = 0; i < received_array.length; i += 2) {
-    var node = [received_array[i], received_array[i + 1]];
-    coords_array.push(node);
-  }
-
-  if (coords_array.length < 3) {
-    coords_array.unshift(0);
-    return JSON.stringify(coords_array);
-  }
-
-  var perms_count = calculateFactorial(coords_array.length - 1);
-  var permengine = new engine(coords_array.length - 1);
-  var permutation;
-  var shortest_permutation = [];
-  var shortest_route_length = 1000000;
-  var second_shortest_permutation;
-  var second_shortest_route_length = 1000000;
-  var route_length;
-  var first_coords = coords_array.shift();
-
-  for (var index = 0; index < perms_count; index++) {
-    permutation = permengine.index2perm(index);
-    route_length = getRouteLength(permutation, coords_array, first_coords);
-    if (route_length < shortest_route_length) {
-      second_shortest_route_length = shortest_route_length;
-      //console.log("2nd: " + second_shortest_route_length + " " + index);
-      second_shortest_permutation = shortest_permutation.slice();
-      shortest_route_length = route_length;
-      //console.log("shortest: " + shortest_route_length + " " + index);
-      shortest_permutation = permutation;
-    } else if (route_length < second_shortest_route_length && route_length > shortest_route_length) {
-      second_shortest_route_length = route_length;
-      //console.log("2nd: " + second_shortest_route_length + " " + index);
-      second_shortest_permutation = permutation;
-    }
-  }
-
-  var shortest_route_array = shortest_permutation.map(getCoordsByPermIndex, coords_array);
-  shortest_route_array.unshift(first_coords); //beginning
-  shortest_route_array.push(first_coords); //ending
-
-  var second_shortest_route_array = [];
-  var both_routes_array = [];
-  if (second_shortest_route_length !== 1000000) {
-    second_shortest_route_array = second_shortest_permutation.map(getCoordsByPermIndex, coords_array);
-    second_shortest_route_array.unshift(first_coords); //beginning
-    second_shortest_route_array.push(first_coords); //ending
-    both_routes_array = shortest_route_array.concat(second_shortest_route_array);
-    both_routes_array.unshift(1); //array to be returned contains both shortest and 2nd shortest paths
-    return JSON.stringify(both_routes_array);
-  }
-
-  shortest_route_array.unshift(0); //array to be returned contains only shortest path
-  return JSON.stringify(shortest_route_array);
-}
-
 function cbChanged() {
   checkCalculationSide(true);
   coordsHandler();
@@ -987,4 +909,3 @@ function checkCalculationSide(call_close) {
     checkWebSocketState();
   }
 }
-
